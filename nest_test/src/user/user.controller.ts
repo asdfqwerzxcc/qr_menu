@@ -9,6 +9,10 @@ export class UserController {
     @Post('/signup')
     async createUser(@Body(ValidationPipe) createUser:CreateUserDto){
         return this.userService.createUser(createUser);
+    }
 
+    @Post('/signin')
+    async signInUser(@Body(ValidationPipe) userInfo:CreateUserDto){
+        return this.userService.signIn(userInfo)
     }
 }
