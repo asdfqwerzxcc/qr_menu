@@ -1,0 +1,9 @@
+server:
+  port: 3000
+
+db:
+  type: 'sqlite'
+  database: 'db/sql'
+
+jwt:
+  expiresIn: 3600

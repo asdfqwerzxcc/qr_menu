@@ -1,0 +1,6 @@
+db:
+
+  synchronize: true
+
+jwt:
+  secret: 'Secret1234'
