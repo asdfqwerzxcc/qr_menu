@@ -6,6 +6,10 @@ import { CreateUserDto } from './Dto/create-user.dto';
 import * as bcrypt from "bcrypt";
 import { JwtService } from '@nestjs/jwt';
 import { updateUserDto } from './Dto/update-user.dto';
+import * as config from 'config'
+
+const jwtConfig=config.get('jwt');
+
 
 @Injectable()
 export class UserService {
@@ -33,14 +37,18 @@ export class UserService {
         // return await this.userRepository.save(newUser)
     }
     //로그인
-    async signIn(userDetail:CreateUserDto): Promise<{accessToken: string}> {
+    async signIn(userDetail:CreateUserDto): Promise<{accessToken: string,refreshToken:string}> {
         const{email,password}=userDetail
         const signInUser=await this.userRepository.findOne({where:{email}});
         if (signInUser && (await bcrypt.compare(password, (signInUser).password)))
         {
             const payload={email};
             const accessToken=await this.jwtService.sign(payload);
-            return{accessToken};
+            const refreshToken=await this.jwtService.sign(payload,{
+                secret:jwtConfig.refresh_secret,
+                expiresIn:jwtConfig.refresh_expiresIn
+                });
+            return{accessToken,refreshToken};
         } else {
             throw new UnauthorizedException('로그인 실패');
         }
@@ -66,6 +74,13 @@ export class UserService {
             }
         })
         return allBoard
+    }
+    //refresh_token을 통한 재발급
+    async reAccessToken(userDetail:CreateUserDto):Promise<{accessToken:string}>{
+        const{email}=userDetail
+        const payload={email};
+        const accessToken=await this.jwtService.sign(payload);
+        return{accessToken}
     }
 
 }

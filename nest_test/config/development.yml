@@ -4,3 +4,4 @@ db:
 
 jwt:
   secret: 'Secret1234'
+  refresh_secret: 'Secret1235'

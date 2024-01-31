@@ -7,6 +7,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import * as config from 'config'
 import { JwtStrategy } from './jwt.strategy';
+import { RefreshStrategy } from './jwt-refresh.strategy';
 
 const jwtConfig=config.get('jwt');
 
@@ -21,7 +22,7 @@ const jwtConfig=config.get('jwt');
     }),
     TypeOrmModule.forFeature([User])],
   controllers: [UserController],
-  providers: [UserService,JwtStrategy],
-  exports:[JwtStrategy,PassportModule]
+  providers: [UserService,JwtStrategy,RefreshStrategy],
+  exports:[JwtStrategy,RefreshStrategy,PassportModule]
 })
 export class UserModule {}

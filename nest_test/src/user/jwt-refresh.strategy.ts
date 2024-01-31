@@ -10,11 +10,11 @@ const JwtConfig=config.get('jwt')
 
 @Injectable()
 
-export class JwtStrategy extends PassportStrategy(Strategy,'jwt'){
+export class RefreshStrategy  extends PassportStrategy(Strategy,'refresh'){
     constructor(@InjectRepository(User) 
     private userRepository:Repository<User>){
         super({
-            secretOrKey:JwtConfig.secret,
+            secretOrKey:JwtConfig.refresh_secret,
             jwtFromRequest:ExtractJwt.fromAuthHeaderAsBearerToken()
         })
     }

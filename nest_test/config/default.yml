@@ -7,3 +7,4 @@ db:
 
 jwt:
   expiresIn: 3600
+  refresh_expiresIn: 68600

@@ -22,16 +22,22 @@ export class UserController {
     }
 
     @Post('/newpswd')
-    @UseGuards(AuthGuard())
+    @UseGuards(AuthGuard('jwt'))
     authTest(@Body(ValidationPipe) password:updateUserDto, @Req() req){
 
         return this.userService.changePassword(password,req.user)
     }
  
     @Get('/list')
-    @UseGuards(AuthGuard(),AdminGuard)
+    @UseGuards(AuthGuard('jwt'),AdminGuard)
     @Roles(UserStatus.ADMIN)   
     async viewMember(){
         return await this.userService.getAllList();
+    }
+
+    @Post('/refresh')
+    @UseGuards(AuthGuard('refresh'))
+    async createAccessToken(@Req() req){
+        return this.userService.reAccessToken(req.user)
     }
 }
