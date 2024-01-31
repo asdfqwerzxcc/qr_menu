@@ -13,7 +13,7 @@ export class UserService {
         private userRepository:Repository<User>, 
         private jwtService:JwtService
     ){}
-
+    //회원가입
     async createUser(userDetail:CreateUserDto): Promise<{statusCode: number, message: string, data: User}>{
         const {email,password,status}=userDetail
         const newUser=this.userRepository.create({email,password,status});
@@ -32,7 +32,7 @@ export class UserService {
         }
         // return await this.userRepository.save(newUser)
     }
-
+    //로그인
     async signIn(userDetail:CreateUserDto): Promise<{accessToken: string}> {
         const{email,password}=userDetail
         const signInUser=await this.userRepository.findOne({where:{email}});
@@ -45,7 +45,7 @@ export class UserService {
             throw new UnauthorizedException('로그인 실패');
         }
     }
-
+    //비밀번호 변경
     async changePassword(newpswd:updateUserDto,updateUser:updateUserDto): Promise<{statusCode:number,message:string}>{
         const pswd={password : await bcrypt.hashSync(newpswd.password,10)};
         try{    
@@ -56,9 +56,16 @@ export class UserService {
             }
         }catch(error){
             throw new ConflictException('비밀번호 변경 실패')
-
         }
-         
+    }
+    //회원목록 조회
+    async getAllList(){
+        const allBoard=await this.userRepository.find({
+            order: {
+                index: 'DESC'
+            }
+        })
+        return allBoard
     }
 
 }
