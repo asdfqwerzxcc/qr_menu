@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import * as config from 'config'
 import { JwtStrategy } from './jwt.strategy';
 import { RefreshStrategy } from './jwt-refresh.strategy';
+import { EmailService } from './email.service';
 
 const jwtConfig=config.get('jwt');
 
@@ -22,7 +23,7 @@ const jwtConfig=config.get('jwt');
     }),
     TypeOrmModule.forFeature([User])],
   controllers: [UserController],
-  providers: [UserService,JwtStrategy,RefreshStrategy],
+  providers: [UserService,JwtStrategy,RefreshStrategy,EmailService],
   exports:[JwtStrategy,RefreshStrategy,PassportModule]
 })
 export class UserModule {}

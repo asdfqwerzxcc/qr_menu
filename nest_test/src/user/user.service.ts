@@ -1,4 +1,4 @@
-import { ConflictException, ConsoleLogger, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, ConsoleLogger, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entity/user.entity';
@@ -7,28 +7,37 @@ import * as bcrypt from "bcrypt";
 import { JwtService } from '@nestjs/jwt';
 import { updateUserDto } from './Dto/update-user.dto';
 import * as config from 'config'
+import { EmailService } from './email.service';
+import { verifyEmailDto } from './Dto/verify-email.dto';
 
 const jwtConfig=config.get('jwt');
 
 
 @Injectable()
 export class UserService {
+    private readonly logger=new Logger(UserService.name)
+
     constructor(@InjectRepository(User) 
         private userRepository:Repository<User>, 
-        private jwtService:JwtService
+        private jwtService:JwtService,
+        private emailService:EmailService
     ){}
     //회원가입
     async createUser(userDetail:CreateUserDto): Promise<{statusCode: number, message: string, data: User}>{
+        this.logger.log("UserService가 호출되었습니다.")
         const {email,password,status}=userDetail
+        this.logger.log(`email: ${email}에대한 회원가입을 시도합니다`)
         const newUser=this.userRepository.create({email,password,status});
         try{
             const successjoin=await this.userRepository.save(newUser)
+            this.logger.log(`email: ${email}에대한 회원가입이 성공했습니다`)
             return{
                 statusCode:201,
                 message:"회원가입 성공",
                 data:successjoin
             }
         }catch(error){
+            this.logger.error(`email: ${email}에대한 회원가입이 실패했습니다`)
             if(error.code==="SQLITE_CONSTRAINT")
             {
                 throw new ConflictException('중복된 이메일입니다')
@@ -82,5 +91,14 @@ export class UserService {
         const accessToken=await this.jwtService.sign(payload);
         return{accessToken}
     }
-
+    // 회원가입 이메일 발송
+    async sendMemberJoinEmail(email:verifyEmailDto) {
+        const signupVerifyToken=email;
+        return await this.emailService.sendMemberJoinVerification(email, signupVerifyToken);
+    }
+    //이메일 유효성검사
+    async verifyEmail(signupVerifyToken:verifyEmailDto){
+        const email={email:signupVerifyToken};
+        return email;
+    }
 }
