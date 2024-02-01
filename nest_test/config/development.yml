@@ -1,7 +1,0 @@
-db:
-
-  synchronize: true
-
-jwt:
-  secret: 'Secret1234'
-  refresh_secret: 'Secret1235'
