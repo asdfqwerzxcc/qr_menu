@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards, ValidationPipe,Logger, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards, ValidationPipe,Logger, Query, Param } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './Dto/create-user.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -45,11 +45,10 @@ export class UserController {
         return this.userService.reAccessToken(req.user)
     }
     //이메일 인증메일 확인
-    @Post('/email-verify')
-    async verifyEmail(@Query() dto:verifyEmailDto){
-        const { signupVerifyToken } = dto;
-        return await this.userService.verifyEmail(signupVerifyToken);
-        // return true
+    @Post('/email-verify/:email')
+    async verifyEmail(@Param() email:verifyEmailDto, @Query() dto:verifyEmailDto){
+        const signupVerifyToken  = dto;
+        return await this.userService.verifyEmail(email,signupVerifyToken);
 }
     //이메일 인증메일 발송
     @Post('/email-check')

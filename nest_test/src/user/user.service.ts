@@ -91,14 +91,46 @@ export class UserService {
         const accessToken=await this.jwtService.sign(payload);
         return{accessToken}
     }
+    //이메일 유효성검사
+    async verifyEmail(email:verifyEmailDto,signupVerifyToken:verifyEmailDto){
+        // const emailverify={email:signupVerifyToken};
+        
+        try{
+            const decode=await this.jwtService.verify(signupVerifyToken.signupVerifyToken,{            
+                secret:jwtConfig.email_secret,
+                });
+            console.log(decode.email)
+            
+            if(decode.email===email.email){
+                return {
+                    statusCode:201,
+                    message:"이메일 인증 성공",
+                } 
+            }
+            else{
+                return{
+                    statusCode:202,
+                    message:"이메일 인증 실패",
+                }
+            }
+        }catch(error){
+            throw new UnauthorizedException("권한이 없습니다.")
+        }
+
+    }
     // 회원가입 이메일 발송
     async sendMemberJoinEmail(email:verifyEmailDto) {
-        const signupVerifyToken=email;
-        return await this.emailService.sendMemberJoinVerification(email, signupVerifyToken);
-    }
-    //이메일 유효성검사
-    async verifyEmail(signupVerifyToken:verifyEmailDto){
-        const email={email:signupVerifyToken};
-        return email;
+        const payload=email
+        const signupVerifyToken=await this.jwtService.sign(payload,{
+            secret:jwtConfig.email_secret,
+            expiresIn:jwtConfig.email_expiresIn
+            });
+        console.log(signupVerifyToken)
+        try{
+            const message=await this.emailService.sendMemberJoinVerification(email, signupVerifyToken);
+            return message;
+        }catch(error){ 
+            throw new ConflictException("userSevice이메일전송실패")
+        }   
     }
 }
