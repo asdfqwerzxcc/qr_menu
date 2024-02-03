@@ -18,6 +18,6 @@ export class User{
         this.password=bcrypt.hashSync(this.password,10)
     }
 
-    @Column({name:'status',length:50,nullable:false,default:"PUBLIC"})
+    @Column({name:'status',length:50,nullable:false,default:"MEMBER"})
     status: UserStatus;
 }
