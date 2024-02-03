@@ -9,6 +9,7 @@ import * as config from 'config'
 import { JwtStrategy } from './jwt.strategy';
 import { RefreshStrategy } from './jwt-refresh.strategy';
 import { EmailService } from './email.service';
+import { SessionService } from './session.service';
 
 const jwtConfig=config.get('jwt');
 
@@ -23,7 +24,7 @@ const jwtConfig=config.get('jwt');
     }),
     TypeOrmModule.forFeature([User])],
   controllers: [UserController],
-  providers: [UserService,JwtStrategy,RefreshStrategy,EmailService],
+  providers: [UserService,JwtStrategy,RefreshStrategy,EmailService,SessionService],
   exports:[JwtStrategy,RefreshStrategy,PassportModule]
 })
 export class UserModule {}

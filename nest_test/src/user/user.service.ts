@@ -9,6 +9,7 @@ import { updateUserDto } from './Dto/update-user.dto';
 import * as config from 'config'
 import { EmailService } from './email.service';
 import { verifyEmailDto } from './Dto/verify-email.dto';
+import { SessionService } from './session.service';
 
 const jwtConfig=config.get('jwt');
 
@@ -20,7 +21,9 @@ export class UserService {
     constructor(@InjectRepository(User) 
         private userRepository:Repository<User>, 
         private jwtService:JwtService,
-        private emailService:EmailService
+        private emailService:EmailService,
+        private sessionService:SessionService
+
     ){}
     //회원가입
     async createUser(userDetail:CreateUserDto): Promise<{statusCode: number, message: string, data: User}>{
@@ -49,6 +52,18 @@ export class UserService {
     async signIn(userDetail:CreateUserDto): Promise<{accessToken: string,refreshToken:string}> {
         const{email,password}=userDetail
         const signInUser=await this.userRepository.findOne({where:{email}});
+
+        //세션을 통한 중복 로그인 검사
+
+        const isAlreadyLoggedIn = this.sessionService.isUserLoggedIn(email);
+
+        if (isAlreadyLoggedIn) {
+            // 중복 로그인이 감지됨
+            throw new UnauthorizedException(`${email}은 이미 로그인 중입니다.`);
+        }   
+        // 세션 등록
+        this.sessionService.registerUser(email);
+        
         if (signInUser && (await bcrypt.compare(password, (signInUser).password)))
         {
             const payload={email};
@@ -99,7 +114,6 @@ export class UserService {
             const decode=await this.jwtService.verify(signupVerifyToken.signupVerifyToken,{            
                 secret:jwtConfig.email_secret,
                 });
-            console.log(decode.email)
             
             if(decode.email===email.email){
                 return {
@@ -125,7 +139,6 @@ export class UserService {
             secret:jwtConfig.email_secret,
             expiresIn:jwtConfig.email_expiresIn
             });
-        console.log(signupVerifyToken)
         try{
             const message=await this.emailService.sendMemberJoinVerification(email, signupVerifyToken);
             return message;
