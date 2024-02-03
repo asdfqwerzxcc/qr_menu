@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ExtractJwt, Strategy } from "passport-jwt";
@@ -9,8 +9,8 @@ import * as config from 'config';
 const JwtConfig=config.get('jwt')
 
 @Injectable()
-
 export class JwtStrategy extends PassportStrategy(Strategy,'jwt'){
+    private readonly logger=new Logger(JwtStrategy.name);
     constructor(@InjectRepository(User) 
     private userRepository:Repository<User>){
         super({
@@ -25,7 +25,6 @@ export class JwtStrategy extends PassportStrategy(Strategy,'jwt'){
         if(!user){
             throw new UnauthorizedException();
         }
-
         return user
     }
 
