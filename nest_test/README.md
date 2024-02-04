@@ -256,7 +256,7 @@ async sendMemberJoinEmail(email:verifyEmailDto) {
             this.logger.log(`${email}은 이미 로그인 중입니다.`);
             throw new UnauthorizedException(`${email}은 이미 로그인 중입니다.`);
         }   
-        this.logger.log(`${email}의 중복검사후 로그인 시도`);
+        this.logger.log(`${email}의 중복검사 후 로그인 시도`);
         
         if (signInUser && (await bcrypt.compare(password, (signInUser).password)))
         {
@@ -291,3 +291,5 @@ export class SessionService{
 }
  ```
 이처럼 로그인전에 세션 검사를 통해 유무를 검사하고 통과하면 세션에 등록을 하는 형식으로 구현하였다.
+
+## ToDo
