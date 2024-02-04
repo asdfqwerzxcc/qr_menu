@@ -57,7 +57,7 @@ export class UserController {
         this.logger.log(`${email.email}의 이메일 인증요청`);
         const signupVerifyToken  = dto;
         return await this.userService.verifyEmail(email,signupVerifyToken);
-}
+    }
     //이메일 인증메일 발송
     @Post('/email-check')
     async checkEmail(@Body() email:verifyEmailDto){

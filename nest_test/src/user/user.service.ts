@@ -65,10 +65,10 @@ export class UserService {
             throw new UnauthorizedException(`${email}은 이미 로그인 중입니다.`);
         }   
         this.logger.log(`${email}의 중복검사후 로그인 시도`);
-        // 세션 등록
         
         if (signInUser && (await bcrypt.compare(password, (signInUser).password)))
         {
+            // 세션 등록
             this.sessionService.registerUser(email);
 
             this.logger.log(`${email}의 로그인 통과 후 JWT토큰 발급`);
